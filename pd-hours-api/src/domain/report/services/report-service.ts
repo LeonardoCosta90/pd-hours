@@ -1,0 +1,75 @@
+import { DayjsDateProvider } from './../../../shared/providers/date-provider/dayjs-date-provider';
+import { EmployeeRepository } from '@domain/employee/typeorm/repositories/employee-repository';
+import { AppError } from '@shared/errors/app-error';
+import { getCustomRepository, getRepository } from 'typeorm';
+import { CreateReportBody } from '../models/create-report-body';
+import { ReportResponsePaginate } from '../models/report-paginate-response';
+import { ReportQueryRequest } from '../models/report-query-response';
+import { Report } from '../typeorm/entities/report';
+import { ReportRepository } from '../typeorm/repositories/resport-repository';
+
+export class ReportService {
+  format = new DayjsDateProvider();
+  async createReport(body: CreateReportBody): Promise<Report> {
+    const reportRepository = getCustomRepository(ReportRepository);
+    const employeeRepository = getCustomRepository(EmployeeRepository);
+    const employeeExists = await employeeRepository.findById(body.employeeId);
+
+    if (!employeeExists) {
+      throw new AppError(
+        `Não foi encontrado o usuário com o id: ${body.employeeId}`,
+        404,
+      );
+    }
+
+    const report = await reportRepository.create({
+      description: body.description,
+      employee_id: body.employeeId,
+      spent_hours: body.spentHours,
+      created_at: this.format.convertToUTC(new Date()),
+      updated_at: this.format.convertToUTC(new Date()),
+    });
+    const response = await reportRepository.save(report);
+    return response;
+  }
+
+  async getReport(
+    reportQueryRequest: ReportQueryRequest,
+  ): Promise<ReportResponsePaginate> {
+    const reportRepository = getRepository(Report);
+    const page = reportQueryRequest.page ? Number(reportQueryRequest.page) : 1;
+    const totalItemsPerPage = reportQueryRequest.totalItemsPerPage
+      ? Number(reportQueryRequest.totalItemsPerPage)
+      : 5;
+    const query = reportRepository
+      .createQueryBuilder('reports')
+      .where('reports.employee_id = :employeeId', {
+        employeeId: reportQueryRequest.employee_id,
+      })
+      .andWhere('reports.created_at > :startDate', {
+        startDate: `${reportQueryRequest.startDate} 00:00:01`,
+      })
+      .andWhere('reports.created_at < :endDate', {
+        endDate: `${reportQueryRequest.endDate} 23:59:59`,
+      });
+
+    query.skip((page - 1) * totalItemsPerPage).take(totalItemsPerPage);
+    const [reports, count] = await query.getManyAndCount();
+
+    const hours = await query
+      .select('SUM(reports.spent_hours)', 'totalSpentHours')
+      .addSelect('AVG(reports.spent_hours)', 'averageSpentHours')
+      .getRawOne();
+    const totalPages = Math.ceil(count / totalItemsPerPage);
+
+    return {
+      data: reports,
+      totalHours: hours.totalSpentHours,
+      averageHours: hours.averageSpentHours,
+      totalItems: count,
+      totalItemsPerPage,
+      page,
+      totalPages,
+    };
+  }
+}
