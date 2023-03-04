@@ -29,7 +29,18 @@ async function listEmployee(
   return response.status(200).json(user);
 }
 
+async function listEmployeeBySquadId(
+  request: Request,
+  response: Response,
+): Promise<Response> {
+  const employeeService = new EmployeeService();
+  const id = Number(request.params?.id);
+  const user = await employeeService.getEmployeesBySquadId({ id });
+  return response.status(200).json(user);
+}
+
 export default {
   createEmployee,
   listEmployee,
+  listEmployeeBySquadId,
 };

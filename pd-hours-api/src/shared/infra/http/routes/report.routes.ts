@@ -10,8 +10,5 @@ reportRoutes.post(
   validateBody(createReportValidation),
   reportController.createReport,
 );
-reportRoutes.get(
-  '/:employeeId/:startDate/:endDate',
-  reportController.listReport,
-);
+reportRoutes.get('/:squadId', reportController.listReport);
 export { reportRoutes };

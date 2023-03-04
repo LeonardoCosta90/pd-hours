@@ -3,7 +3,6 @@ import { EmployeeRepository } from '@domain/employee/typeorm/repositories/employ
 import { AppError } from '@shared/errors/app-error';
 import { getCustomRepository, getRepository } from 'typeorm';
 import { CreateReportBody } from '../models/create-report-body';
-import { ReportResponsePaginate } from '../models/report-paginate-response';
 import { ReportQueryRequest } from '../models/report-query-response';
 import { Report } from '../typeorm/entities/report';
 import { ReportRepository } from '../typeorm/repositories/resport-repository';
@@ -30,12 +29,11 @@ export class ReportService {
       updated_at: this.format.convertToUTC(new Date()),
     });
     const response = await reportRepository.save(report);
+
     return response;
   }
 
-  async getReport(
-    reportQueryRequest: ReportQueryRequest,
-  ): Promise<ReportResponsePaginate> {
+  async getReport(reportQueryRequest: ReportQueryRequest): Promise<any> {
     const reportRepository = getRepository(Report);
     const page = reportQueryRequest.page ? Number(reportQueryRequest.page) : 1;
     const totalItemsPerPage = reportQueryRequest.totalItemsPerPage
@@ -43,16 +41,11 @@ export class ReportService {
       : 5;
     const query = reportRepository
       .createQueryBuilder('reports')
-      .where('reports.employee_id = :employeeId', {
-        employeeId: reportQueryRequest.employee_id,
-      })
-      .andWhere('reports.created_at > :startDate', {
-        startDate: `${reportQueryRequest.startDate} 00:00:01`,
-      })
-      .andWhere('reports.created_at < :endDate', {
-        endDate: `${reportQueryRequest.endDate} 23:59:59`,
+      .innerJoinAndSelect('reports.employee', 're')
+      .innerJoinAndSelect('re.squad', 'rs')
+      .where('rs.id = :id', {
+        id: reportQueryRequest.squadId,
       });
-
     query.skip((page - 1) * totalItemsPerPage).take(totalItemsPerPage);
     const [reports, count] = await query.getManyAndCount();
 
@@ -62,10 +55,13 @@ export class ReportService {
       .getRawOne();
     const totalPages = Math.ceil(count / totalItemsPerPage);
 
+    const avg = +hours.averageSpentHours;
+    const avgPrecision = avg.toPrecision(2);
+
     return {
       data: reports,
       totalHours: hours.totalSpentHours,
-      averageHours: hours.averageSpentHours,
+      averageHours: avgPrecision,
       totalItems: count,
       totalItemsPerPage,
       page,

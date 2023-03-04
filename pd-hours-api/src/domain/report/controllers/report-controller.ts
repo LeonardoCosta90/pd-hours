@@ -21,14 +21,11 @@ async function listReport(
 
   const param: ReportQueryRequest = {
     startDate: request.params?.startDate,
-    endDate: request.params?.endDate,
-    employee_id: +request.params?.employeeId,
     totalItemsPerPage: request.body.totalItemsPerPage as string,
+    squadId: +request.params?.squadId,
     page: request.params.body as string,
   };
-
   const user = await reportService.getReport(param);
-
   return response.status(200).json(user);
 }
 

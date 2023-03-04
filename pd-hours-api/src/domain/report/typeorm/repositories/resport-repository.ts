@@ -23,6 +23,14 @@ class ReportRepository extends Repository<Report> {
 
     return report;
   }
+
+  public async filterHours(squadId: number): Promise<Report | undefined> {
+    const report = await this.findOne({
+      relations: ['employee', 'squads'],
+      where: { squads: { id: squadId } },
+    });
+    return report;
+  }
 }
 
 export { ReportRepository };

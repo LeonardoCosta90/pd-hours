@@ -1,7 +1,7 @@
 import { SquadRepository } from '@domain/squad/typeorm/repositories/squad-repository';
 import { AppError } from '@shared/errors/app-error';
 import { DayjsDateProvider } from '@shared/providers/date-provider/dayjs-date-provider';
-import { getCustomRepository, getRepository } from 'typeorm';
+import { getCustomRepository, getRepository, IsNull } from 'typeorm';
 import { CreateEmployeeBody } from '../models/create-employee-body';
 import { EmployeeResponsePaginate } from '../models/employee-paginate-response';
 import { EmployeeQueryRequest } from '../models/employee-query-response';
@@ -14,9 +14,14 @@ export class EmployeeService {
     const employeeRepository = getCustomRepository(EmployeeRepository);
     const squadRepository = getCustomRepository(SquadRepository);
     const squadExists = await squadRepository.findById(body.squadId);
+    const employeeExists = await employeeRepository.findByName(body.name);
 
     if (!squadExists) {
-      throw new AppError(`Não existe um squad com id: ${body.squadId}`, 404);
+      throw new AppError(`Não existe um squad com id: ${body.squadId}`, 400);
+    }
+
+    if (employeeExists) {
+      throw new AppError(`Usuário com o nome: ${body.name} ja existe`, 400);
     }
 
     const squadEmployee = await employeeRepository.create({
@@ -47,6 +52,37 @@ export class EmployeeService {
     const totalPages = Math.ceil(count / totalItemsPerPage);
     return {
       data: employees,
+      squadName: '',
+      totalItems: count,
+      totalItemsPerPage,
+      page,
+      totalPages,
+    };
+  }
+
+  async getEmployeesBySquadId(
+    employeeQueryRequest: EmployeeQueryRequest,
+  ): Promise<EmployeeResponsePaginate> {
+    const employeeRepository = getRepository(Employee);
+    const squadRepository = getCustomRepository(SquadRepository);
+    const name = await squadRepository.findNameById(employeeQueryRequest.id);
+    const page = employeeQueryRequest.page
+      ? Number(employeeQueryRequest.page)
+      : 1;
+    const totalItemsPerPage = employeeQueryRequest.totalItemsPerPage
+      ? Number(employeeQueryRequest.totalItemsPerPage)
+      : 5;
+    const query = employeeRepository
+      .createQueryBuilder('employees')
+      .where('employees.squad_id = :squadId', {
+        squadId: employeeQueryRequest.id,
+      });
+    query.skip((page - 1) * totalItemsPerPage).take(totalItemsPerPage);
+    const [employees, count] = await query.getManyAndCount();
+    const totalPages = Math.ceil(count / totalItemsPerPage);
+    return {
+      data: employees,
+      squadName: name,
       totalItems: count,
       totalItemsPerPage,
       page,

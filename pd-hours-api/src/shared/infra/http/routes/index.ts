@@ -5,8 +5,8 @@ import { squadRoutes } from './squad.routes';
 
 const router = Router();
 
-router.use('/squad', squadRoutes);
-router.use('/employee', employeeRoutes);
-router.use('/report', reportRoutes);
+router.use('/squads', squadRoutes);
+router.use('/employees', employeeRoutes);
+router.use('/reports', reportRoutes);
 
 export { router };

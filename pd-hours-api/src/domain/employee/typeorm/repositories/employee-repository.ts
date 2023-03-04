@@ -1,4 +1,5 @@
 import { Employee } from '@domain/employee/typeorm/entities/employee';
+import { Report } from '@domain/report/typeorm/entities/report';
 import { EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(Employee)
