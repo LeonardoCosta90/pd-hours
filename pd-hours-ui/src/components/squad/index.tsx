@@ -1,30 +1,19 @@
 import {
-   Box, Button, Divider,
+   Box, 
+   Button, 
    Flex,
-   Heading, Table,
+   Table,
    Tbody,
    Td,
    Text,
    Th,
    Thead,
-   Tr,
-   useBreakpointValue
+   Tr
 } from '@chakra-ui/react';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect, useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import * as yup from 'yup';
-import { useAuth } from '../../auth/hooks/useAuth';
-import { Header } from '../Header';
-import Pagination from '../Pagination';
-import { Sidebar } from '../Sidebar';
 import { api } from '../../services/api/api';
-import moment from 'moment';
-import Link from 'next/link';
 import CreateSquadModal from '../modals/squad-modal';
 import EmptySquad from '../empty-squad';
-import SquadDetails from './details';
-import CreateReportModal from '../modals/create-report-modal'
  
  type Squads = {
    id: number;
@@ -49,7 +38,6 @@ import CreateReportModal from '../modals/create-report-modal'
 
         } catch (err) {
             console.log(err)
-            alert('Ocorreu um erro!')
         }
     }
     getData();

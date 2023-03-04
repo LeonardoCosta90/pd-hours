@@ -9,7 +9,6 @@ import {
   Thead,
   Tr,
 } from '@chakra-ui/react';
-
 import { useEffect, useState } from 'react';
 import EmptyUser from '../../components/empty-user';
 import { Header } from '../../components/Header';

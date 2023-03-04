@@ -45,11 +45,6 @@ export default function CreateReportModal() {
 
   const createReport= async () => {
     try {
-      console.log({
-        "description": description,
-        "spentHours": hours,
-        "employeeId": id
-      })
       await api.post('/reports', {
         "description": description,
         "spentHours": hours,
