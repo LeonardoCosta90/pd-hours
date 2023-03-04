@@ -94,6 +94,7 @@ export default function SquadsDetails() {
 
   return (
     <Box>
+    <title>PD Hours</title>
     <Header/>
     <Flex
       width="70%"

@@ -37,6 +37,7 @@ export default function Home({data}: HomeProps) {
 
   return (
     <Box>
+    <title>PD Hours</title>
     <Header/>
     <Flex
       width="70%"

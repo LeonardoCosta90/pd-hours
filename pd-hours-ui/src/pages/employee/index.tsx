@@ -51,6 +51,7 @@ export default function Employees( {data}: HomeProps) {
 
 return (
   <Box>
+  <title>PD Hours</title>
   <Header/>
   <Flex
     width="70%"
