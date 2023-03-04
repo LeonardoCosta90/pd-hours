@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import EmptySquadUser from "../../../components/empty-squad-user";
 import moment from "moment";
 import { api } from "../../../services/api/api";
+import Image from "next/image";
 
 type Report = {
   id: number;
@@ -59,6 +60,7 @@ const INITIAL_VALUE_REPORT: ReportProps = {
 
 export default function SquadsDetails() {
   const [report, setReport] = useState(INITIAL_VALUE_REPORT);
+  const [user, setUser] = useState(0);
   const [startDate, setStartDate] = useState(moment(new Date()).format('yyyy-MM-DD'))
   const [endDate, setEndDate] = useState(moment(new Date()).format('yyyy-MM-DD'))
   const router = useRouter();
@@ -69,6 +71,7 @@ export default function SquadsDetails() {
         try {
             const reports = await api.get(`/reports/${Number(id)}`)
             setReport(reports.data) 
+            setUser(reports.data.totalUsers) 
         } catch (err) {
             console.log(err)
         }
@@ -85,7 +88,12 @@ export default function SquadsDetails() {
   }
 
   const filterHours= async () => {
-    console.log(startDate,endDate);
+    try {
+      const reports = await api.get(`/reports/${id}/${startDate}/${endDate}`)
+      setReport(reports.data) 
+    } catch (err) {
+        console.log(err)
+    }
   }
 
   return (
@@ -102,7 +110,7 @@ export default function SquadsDetails() {
     >
     <TabNav/>
     <Text fontSize={"38px"} fontWeight={"500"} >{report.data[0]?.employee.squad.name}</Text>
-    {report.totalUsers > 0 ?  (
+    {user > 0 ?  (
       <Flex display={"flex"} flexDirection={"column"}  justifyContent={"space-between"} >
         <Box bg="white" p="4" w="150%" h="650" display={"flex"} flexDirection={"column"}  justifyContent={"space-evenly"} mt="5" alignItems="center" borderRadius='md'>
         <Text fontSize={"28px"} fontWeight={"400"}>Horas por membro</Text>
@@ -113,33 +121,49 @@ export default function SquadsDetails() {
           Filtrar por data
           </Button>
         </Stack>
-        <Box bg="white" px="4" >      
+        <Box bg="white" px="4" >   
+        {report.totalItems > 0 ?  (
           <Table width='750px' mt="5">
-            <Thead>
-              <Tr >
-                <Th background={"#4263EB"} color="white" fontSize="16px" >Membro</Th>
-                <Th background={"#4263EB"} color="white" fontSize="16px">Descrição</Th>
-                <Th background={"#4263EB"} color="white" fontSize="16px">Horas</Th>
-                <Th background={"#4263EB"} color="white" fontSize="16px">Criado em</Th>
-              </Tr>
-            </Thead>       
-            <Tbody>
-            {report.data.map(item => (
-            <Tr key={item.id}>
-              <Td>{item?.employee.name}</Td>            
-              <Td>{item?.description}</Td>
-              <Td>{item?.spent_hours}</Td>
-              <Td>{moment(item?.created_at).format('DD/MM/YYYY')}</Td>       
+          <Thead>
+            <Tr >
+              <Th background={"#4263EB"} color="white" fontSize="16px" >Membro</Th>
+              <Th background={"#4263EB"} color="white" fontSize="16px">Descrição</Th>
+              <Th background={"#4263EB"} color="white" fontSize="16px">Horas</Th>
+              <Th background={"#4263EB"} color="white" fontSize="16px">Criado em</Th>
             </Tr>
-          ))}
-            </Tbody>            
-          </Table>
+          </Thead>       
+          <Tbody>
+          {report.data.map(item => (
+          <Tr key={item.id}>
+            <Td>{item?.employee.name}</Td>            
+            <Td>{item?.description}</Td>
+            <Td>{item?.spent_hours}</Td>
+            <Td>{moment(item?.created_at).format('DD/MM/YYYY')}</Td>       
+          </Tr>
+        ))}
+          </Tbody>            
+        </Table>
+        ): (
+          <Flex >
+            <Box bg="white" p="4" w="150%" h="411" display={"flex"} flexDirection={"column"}   mt="10" alignItems="center" borderRadius='md'>         
+            <Image src='/sad-face.svg' height="128" width="128"alt='sad-face'/>
+            <Text size="16px" color="#ACB5BD" mt="5">Nenhum dado encontrado, selecione uma data para visualizar.</Text>
+            </Box>
+          </Flex>  
+        )}        
         </Box>
-        <Text fontSize={"28px"} fontWeight={"400"}>Horas totais da squad</Text>
-        <Text fontSize={"50px"} fontWeight={"500"} color={"#4263EB"}>{report?.totalHours} Horas</Text>
-        <Text fontSize={"28px"} fontWeight={"400"} >Média de horas por dia</Text>
-        <Text fontSize={"50px"} fontWeight={"500"} color={"#4263EB"}>{report?.averageHours}/Dia</Text>
-        </Box>
+        {report.totalItems > 0 ?  ( 
+          <>
+            <Text fontSize={"28px"} fontWeight={"400"}>Horas totais da squad</Text>
+            <Text fontSize={"50px"} fontWeight={"500"} color={"#4263EB"}>{report?.totalHours} Horas</Text>
+            <Text fontSize={"28px"} fontWeight={"400"} >Média de horas por dia</Text>
+            <Text fontSize={"50px"} fontWeight={"500"} color={"#4263EB"}>{report?.averageHours}/Dia</Text>
+          </>
+        ):(
+          <></>
+        )}
+
+      </Box>
     </Flex>
     ): (
       <EmptySquadUser/>
