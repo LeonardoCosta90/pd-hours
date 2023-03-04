@@ -96,7 +96,7 @@ export default function SquadsDetails() {
           <Input type="date" w="190px"></Input>
           <Input type="date" w="190px"></Input>
           <Button type="submit" form="new-squad" background="#4263EB" color='white' mr={3}>
-          Lançar horas
+          Filtrar por data
           </Button>
         </Stack>
         <Box bg="white" px="4" >      
