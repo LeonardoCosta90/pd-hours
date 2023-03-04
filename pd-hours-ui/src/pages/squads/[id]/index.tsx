@@ -59,8 +59,10 @@ const INITIAL_VALUE_REPORT: ReportProps = {
 
 export default function SquadsDetails() {
   const [report, setReport] = useState(INITIAL_VALUE_REPORT);
+  const [startDate, setStartDate] = useState(moment(new Date()).format('yyyy-MM-DD'))
+  const [endDate, setEndDate] = useState(moment(new Date()).format('yyyy-MM-DD'))
   const router = useRouter();
-  const {id} = router.query
+  const {id} = router?.query
 
   useEffect(() => {
     const getData = async () => {
@@ -73,6 +75,18 @@ export default function SquadsDetails() {
     }
     getData();
  }, [id]) 
+
+  const handleStartDate = (value: string) => {
+  setStartDate(value)
+  }
+
+  const handleEndDate = (value: string) => {
+    setEndDate(value)
+  }
+
+  const filterHours= async () => {
+    console.log(startDate,endDate);
+  }
 
   return (
     <Box>
@@ -93,9 +107,9 @@ export default function SquadsDetails() {
         <Box bg="white" p="4" w="150%" h="650" display={"flex"} flexDirection={"column"}  justifyContent={"space-evenly"} mt="5" alignItems="center" borderRadius='md'>
         <Text fontSize={"28px"} fontWeight={"400"}>Horas por membro</Text>
         <Stack direction='row' alignItems="center" >
-          <Input type="date" w="190px"></Input>
-          <Input type="date" w="190px"></Input>
-          <Button type="submit" form="new-squad" background="#4263EB" color='white' mr={3}>
+          <Input type="date" w="190px" value={startDate} onChange={(e) => handleStartDate(e.target.value)}></Input>
+          <Input type="date" w="190px" value={endDate} onChange={(e) => handleEndDate(e.target.value)}></Input>
+          <Button type="submit" form="new-squad" background="#4263EB" color='white' mr={3} onClick={filterHours}>
           Filtrar por data
           </Button>
         </Stack>

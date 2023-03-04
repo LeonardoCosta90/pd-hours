@@ -47,7 +47,7 @@ export default function Home({data}: HomeProps) {
       >
       <TabNav/>
       <Flex ml="-160" display={"flex"} flexDirection={"column"}  justifyContent={"space-between"} mt="20">
-      {squad.length < 0 ? (
+      {squad.length > 0 ? (
         <>
           <Text fontSize={"38px"} fontWeight={"500"}>Lista de Squads</Text>
           <Box bg="white" p="4" mt="10">      
