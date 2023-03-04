@@ -41,7 +41,7 @@ $ yarn
 ou
 $ npm i
 
-# Rode o servidor
+# Rode a interface
 $ yarn dev
 ou
 $ npm run dev
