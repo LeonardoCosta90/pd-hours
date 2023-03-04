@@ -63,7 +63,7 @@ export default function CreateEmployeeModal() {
 
   return (
     <>
-      <Button  w="182px" h="48px" color="white" background="#4263EB" onClick={onOpen} ml="5" mt="10">Criar usuário</Button>
+      <Button  w="182px" h="48px" color="white" background="#4263EB" onClick={onOpen} ml="5" mt="5">Criar usuário</Button>
       <Modal
         initialFocusRef={initialRef}
         finalFocusRef={finalRef}

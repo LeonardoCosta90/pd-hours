@@ -51,7 +51,7 @@ export default function Home({data}: HomeProps) {
         <>
           <Text fontSize={"38px"} fontWeight={"500"}>Lista de Squads</Text>
           <Box bg="white" p="4" mt="10">      
-            <Table width='750px' mt="5" >
+            <Table width='750px' mt="5" mb="5">
               <Thead>
                 <Tr >
                   <Th background={"#4263EB"} color="white" fontSize="16px" >ID</Th>

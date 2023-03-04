@@ -52,6 +52,7 @@ export class ReportService {
     const hours = await query
       .select('SUM(reports.spent_hours)', 'totalSpentHours')
       .addSelect('AVG(reports.spent_hours)', 'averageSpentHours')
+      .addSelect('COUNT(DISTINCT reports.employee_id)', 'count')
       .getRawOne();
     const totalPages = Math.ceil(count / totalItemsPerPage);
 
@@ -60,8 +61,9 @@ export class ReportService {
 
     return {
       data: reports,
-      totalHours: hours.totalSpentHours,
-      averageHours: avgPrecision,
+      totalUsers: Number(hours.count),
+      totalHours: Number(hours.totalSpentHours),
+      averageHours: Number(avgPrecision),
       totalItems: count,
       totalItemsPerPage,
       page,
