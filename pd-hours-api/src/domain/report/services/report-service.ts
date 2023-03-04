@@ -6,6 +6,7 @@ import { CreateReportBody } from '../models/create-report-body';
 import { ReportQueryRequest } from '../models/report-query-response';
 import { Report } from '../typeorm/entities/report';
 import { ReportRepository } from '../typeorm/repositories/resport-repository';
+import { ReportResponsePaginate } from '../models/report-paginate-response';
 
 export class ReportService {
   format = new DayjsDateProvider();
@@ -33,7 +34,9 @@ export class ReportService {
     return response;
   }
 
-  async getReport(reportQueryRequest: ReportQueryRequest): Promise<any> {
+  async getReport(
+    reportQueryRequest: ReportQueryRequest,
+  ): Promise<ReportResponsePaginate> {
     const reportRepository = getRepository(Report);
     const page = reportQueryRequest.page ? Number(reportQueryRequest.page) : 1;
     const totalItemsPerPage = reportQueryRequest.totalItemsPerPage
