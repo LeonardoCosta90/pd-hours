@@ -49,6 +49,15 @@ export class ReportService {
       .where('rs.id = :id', {
         id: reportQueryRequest.squadId,
       });
+    if (reportQueryRequest.startDate && reportQueryRequest.startDate) {
+      query.andWhere('reports.created_at >= :startDate', {
+        startDate: `${reportQueryRequest.startDate} 03:00:00`,
+      });
+      query.andWhere('reports.created_at <= :endDate', {
+        endDate: `${reportQueryRequest.endDate} 20:59:59`,
+      });
+    }
+
     query.skip((page - 1) * totalItemsPerPage).take(totalItemsPerPage);
     const [reports, count] = await query.getManyAndCount();
 

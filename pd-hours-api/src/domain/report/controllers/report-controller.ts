@@ -21,6 +21,7 @@ async function listReport(
 
   const param: ReportQueryRequest = {
     startDate: request.params?.startDate,
+    endDate: request.params?.endDate,
     totalItemsPerPage: request.body.totalItemsPerPage as string,
     squadId: +request.params?.squadId,
     page: request.params.body as string,
